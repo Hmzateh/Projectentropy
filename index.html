@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project Entropy – Claim Your Galaxy</title>
+
+<!-- Meta Pixel -->
+<script>
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+fbq('init','1609173570075426');
+fbq('track','PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1609173570075426&ev=PageView&noscript=1"/></noscript>
+
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+
+  :root{
+    --cyan:#00d4ff;
+    --cyan-bright:#33e6ff;
+    --cyan-dim:rgba(0,212,255,0.6);
+    --cyan-glow:rgba(0,212,255,0.35);
+    --cyan-soft:rgba(0,212,255,0.15);
+    --afflink:https://to.wendiro.com/u?k=220e77cdef8b42929dd5c06ff71b4ae5&via=22457;
+  }
+
+  html,body{
+    width:100%;height:100%;
+    overflow:hidden;
+    font-family:'Trebuchet MS',sans-serif;
+    background:#000;
+  }
+
+  /* ── BACKGROUND ── */
+  #bg{
+    position:fixed;inset:0;z-index:0;
+    background:url('bg.jpeg') center center/cover no-repeat;
+  }
+  #bg::after{
+    content:'';position:absolute;inset:0;
+    background:linear-gradient(rgba(0,0,0,0.65),rgba(0,0,0,0.85));
+  }
+
+  /* star particles */
+  #stars{position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+  .star{position:absolute;border-radius:50%;background:#fff;animation:twinkle var(--d,3s) infinite alternate}
+  @keyframes twinkle{0%{opacity:.1;transform:scale(1)}100%{opacity:.8;transform:scale(1.4)}}
+
+  /* scan-line overlay */
+  #scan{
+    position:fixed;inset:0;z-index:2;pointer-events:none;
+    background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px);
+  }
+
+  /* ── LAYOUT ── */
+  #wrap{
+    position:relative;z-index:10;
+    width:100%;height:100vh;
+    display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+    gap:0;
+    padding:0 16px;
+    overflow:hidden;
+  }
+
+  /* ── LOGO ── */
+  #logo{
+    width:clamp(80px,10vw,130px);
+    flex-shrink:0;
+    filter:drop-shadow(0 0 12px var(--cyan-glow)) drop-shadow(0 0 4px var(--cyan));
+    margin-bottom:clamp(6px,1.2vh,14px);
+  }
+
+  /* ── HEADLINE ── */
+  #headline{
+    text-align:center;
+    font-size:clamp(1.1rem,4vw,2.8rem);
+    font-weight:900;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    line-height:1.1;
+    color:#fff;
+    flex-shrink:0;
+    text-shadow:0 0 40px var(--cyan-glow),0 0 8px rgba(255,255,255,0.3);
+    animation:fadeDown .8s ease both;
+    margin-bottom:clamp(4px,1vh,10px);
+  }
+  @keyframes fadeDown{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:translateY(0)}}
+
+  /* ── SUBTEXT ── */
+  #sub{
+    text-align:center;
+    font-size:clamp(.7rem,1.6vw,.95rem);
+    color:rgba(200,235,255,0.82);
+    max-width:560px;
+    line-height:1.4;
+    letter-spacing:0.02em;
+    flex-shrink:0;
+    animation:fadeDown .9s ease .15s both;
+    margin-bottom:clamp(4px,1vh,10px);
+  }
+
+  /* ── VIDEO CONTAINER ── */
+  #vid-wrap{
+    position:relative;
+    width:100%;
+    max-width:720px;
+    /* height set by JS */
+    border:2px solid var(--cyan-dim);
+    border-radius:12px;
+    box-shadow:0 0 30px var(--cyan-glow),0 0 60px rgba(0,212,255,0.15),inset 0 0 20px rgba(0,212,255,0.05);
+    overflow:hidden;
+    cursor:pointer;
+    animation:fadeDown 1s ease .25s both;
+    flex-shrink:1;
+    min-height:0;
+  }
+
+  /* corner deco */
+  #vid-wrap::before,#vid-wrap::after{
+    content:'';position:absolute;width:20px;height:20px;z-index:5;pointer-events:none;
+  }
+  #vid-wrap::before{top:-1px;left:-1px;border-top:2px solid var(--cyan);border-left:2px solid var(--cyan)}
+  #vid-wrap::after{bottom:-1px;right:-1px;border-bottom:2px solid var(--cyan);border-right:2px solid var(--cyan)}
+
+  #vid-wrap video{
+    width:100%;height:100%;
+    object-fit:cover;
+    border-radius:10px;
+    display:block;
+  }
+
+  /* ── PLAY BUTTON ── */
+  #play-btn{
+    position:absolute;top:50%;left:50%;
+    transform:translate(-50%,-50%);
+    z-index:20;
+    width:clamp(44px,8vw,72px);
+    height:clamp(44px,8vw,72px);
+    border-radius:50%;
+    background:rgba(0,0,0,0.6);
+    border:2px solid var(--cyan);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 0 20px var(--cyan-glow),0 0 40px rgba(0,212,255,0.2);
+    transition:transform .2s,box-shadow .2s;
+    animation:playPulse 2s ease-in-out infinite;
+    cursor:pointer;
+  }
+  #play-btn:hover{
+    transform:translate(-50%,-50%) scale(1.12);
+    box-shadow:0 0 30px var(--cyan),0 0 60px var(--cyan-glow);
+    animation:none;
+  }
+  @keyframes playPulse{
+    0%,100%{box-shadow:0 0 20px var(--cyan-glow),0 0 40px rgba(0,212,255,0.2)}
+    50%{box-shadow:0 0 35px var(--cyan-dim),0 0 70px var(--cyan-glow)}
+  }
+  #play-btn svg{
+    fill:var(--cyan);
+    width:clamp(16px,3vw,26px);
+    height:clamp(16px,3vw,26px);
+    margin-left:3px;
+    filter:drop-shadow(0 0 6px var(--cyan));
+  }
+
+  /* ── CTA SECTION ── */
+  #cta-wrap{
+    width:100%;
+    max-width:720px;
+    display:flex;flex-direction:column;
+    align-items:center;
+    gap:5px;
+    animation:fadeDown 1s ease .4s both;
+    flex-shrink:0;
+    margin-top:clamp(5px,1vh,12px);
+  }
+
+  #cta-btn{
+    width:100%;
+    padding:clamp(10px,1.8vh,16px) 20px;
+    background:var(--cyan);
+    border:2px solid var(--cyan);
+    border-radius:8px;
+    color:#001a20;
+    font-family:'Trebuchet MS',sans-serif;
+    font-size:clamp(.75rem,2vw,1rem);
+    font-weight:900;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    cursor:pointer;
+    position:relative;
+    overflow:hidden;
+    box-shadow:0 0 30px var(--cyan-glow),0 0 60px rgba(0,212,255,0.2);
+    animation:ctaPulse 2.5s ease-in-out infinite;
+    transition:background .2s,box-shadow .2s;
+    text-decoration:none;
+    display:block;
+    text-align:center;
+  }
+  #cta-btn::before{content:none}
+  #cta-btn::after{
+    content:'';
+    position:absolute;top:0;left:50%;
+    width:clamp(4px,1vw,8px);height:3px;
+    background:rgba(0,26,32,0.6);
+    box-shadow:0 0 8px rgba(0,26,32,0.4);
+    border-radius:2px;
+    transform:translateX(-50%);
+    animation:blink 1.2s ease-in-out infinite;
+  }
+
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+  @keyframes ctaPulse{
+    0%,100%{transform:scale(1);box-shadow:0 0 25px var(--cyan-glow),0 0 50px rgba(0,212,255,0.15)}
+    50%{transform:scale(1.014);box-shadow:0 0 45px var(--cyan-dim),0 0 80px var(--cyan-glow)}
+  }
+  #cta-btn:hover{
+    background:var(--cyan-bright);
+    border-color:var(--cyan-bright);
+    box-shadow:0 0 50px var(--cyan),0 0 80px var(--cyan-glow);
+    animation:none;
+    transform:scale(1.015);
+  }
+
+  #free-tag{
+    font-size:clamp(.6rem,1.2vw,.75rem);
+    color:rgba(0,212,255,0.55);
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+  }
+
+  /* ── HIDE SUB ON SHORT SCREENS ── */
+  @media(max-height:620px){#sub{display:none}}
+  @media(max-height:480px){#free-tag{display:none}#logo{width:65px}}
+</style>
+</head>
+<body>
+
+<div id="bg"></div>
+<div id="stars"></div>
+<div id="scan"></div>
+
+<div id="wrap">
+
+  <img id="logo" src="logo.png" alt="Project Entropy">
+
+  <h1 id="headline">The Galaxy Is Waiting<br>For Its Ruler</h1>
+
+  <p id="sub">Colonize new worlds, command powerful fleets and build the most advanced civilization in Project Entropy.</p>
+
+  <!-- VIDEO -->
+  <div id="vid-wrap" id="video-container">
+    <video id="game-video" preload="metadata" playsinline>
+      <source src="video.m3u8" type="application/x-mpegURL">
+    </video>
+    <div id="play-btn">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8 5v14l11-7z"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div id="cta-wrap">
+    <a id="cta-btn" href="https://to.wendiro.com/u?k=220e77cdef8b42929dd5c06ff71b4ae5&via=22457" target="_blank" rel="noopener">
+      START YOUR GALACTIC EMPIRE ▶
+    </a>
+    <span id="free-tag">Free to Play</span>
+  </div>
+
+</div>
+
+<script>
+/* ── STARS ── */
+(function(){
+  var c=document.getElementById('stars'),f=document.createDocumentFragment();
+  for(var i=0;i<80;i++){
+    var s=document.createElement('div');
+    s.className='star';
+    var sz=Math.random()*2+1;
+    s.style.cssText='width:'+sz+'px;height:'+sz+'px;top:'+Math.random()*100+'%;left:'+Math.random()*100+'%;--d:'+(2+Math.random()*4)+'s;animation-delay:'+(Math.random()*4)+'s;opacity:'+(0.1+Math.random()*0.5);
+    f.appendChild(s);
+  }
+  c.appendChild(f);
+})();
+
+/* ── DYNAMIC VIDEO HEIGHT ── */
+function fitVideo(){
+  var vh=window.innerHeight;
+  var vw=window.innerWidth;
+  var pad=Math.min(20,vh*0.02)*2;
+
+  /* measure fixed elements */
+  var logo=document.getElementById('logo');
+  var headline=document.getElementById('headline');
+  var sub=document.getElementById('sub');
+  var ctaWrap=document.getElementById('cta-wrap');
+
+  var logoH=logo.offsetHeight+parseInt(getComputedStyle(logo).marginBottom||0);
+  var headH=headline.offsetHeight+parseInt(getComputedStyle(headline).marginBottom||0);
+  var subH=(getComputedStyle(sub).display==='none')?0:sub.offsetHeight+parseInt(getComputedStyle(sub).marginBottom||0);
+  var ctaH=ctaWrap.offsetHeight;
+  var marginTop=Math.min(12,vh*0.01);
+
+  var remaining=vh-pad-logoH-headH-subH-ctaH-marginTop-16;
+  remaining=Math.max(80,remaining);
+
+  /* cap by 16:9 ratio and container width */
+  var maxW=Math.min(720,vw-32);
+  var ratioH=maxW*(9/16);
+  var vidH=Math.min(remaining,ratioH);
+  var vidW=vidH*(16/9);
+  if(vidW>maxW){vidW=maxW;vidH=vidW*(9/16);}
+
+  var wrap=document.getElementById('vid-wrap');
+  wrap.style.height=Math.floor(vidH)+'px';
+  wrap.style.width=Math.floor(vidW)+'px';
+}
+
+window.addEventListener('load',fitVideo);
+window.addEventListener('resize',fitVideo);
+
+/* ── VIDEO + PLAY ── */
+var AFFLINK='https://to.wendiro.com/u?k=220e77cdef8b42929dd5c06ff71b4ae5&via=22457';
+var video=document.getElementById('game-video');
+var playBtn=document.getElementById('play-btn');
+var vidWrap=document.getElementById('vid-wrap');
+
+function initVideo(){
+  if(video.canPlayType('application/vnd.apple.mpegurl')){
+    video.src='video.m3u8';
+  } else if(window.Hls&&Hls.isSupported()){
+    var hls=new Hls();hls.loadSource('video.m3u8');hls.attachMedia(video);
+  }
+}
+(function(){
+  var s=document.createElement('script');
+  s.src='https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.4.12/hls.min.js';
+  s.onload=initVideo;s.onerror=initVideo;
+  document.head.appendChild(s);
+})();
+
+var firstPlay=true;
+function handlePlay(e){
+  e.stopPropagation();
+  if(firstPlay){firstPlay=false;window.open(AFFLINK,'_blank','noopener');}
+  video.play().catch(function(){});
+  playBtn.style.opacity='0';playBtn.style.pointerEvents='none';
+}
+playBtn.addEventListener('click',handlePlay);
+vidWrap.addEventListener('click',function(e){
+  if(video.paused){handlePlay(e);}else{video.pause();}
+});
+video.addEventListener('pause',function(){playBtn.style.opacity='1';playBtn.style.pointerEvents='auto';});
+video.addEventListener('ended',function(){playBtn.style.opacity='1';playBtn.style.pointerEvents='auto';});
+
+/* ── CTA TRACKING ── */
+document.getElementById('cta-btn').addEventListener('click',function(){fbq('track','Lead');});
+
+/* ── PREVENT SCROLL BOUNCE MOBILE ── */
+document.addEventListener('touchmove',function(e){e.preventDefault();},{passive:false});
+</script>
+</body>
+</html>
